@@ -1,0 +1,36 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - web</title>
+    <link rel="stylesheet" href="~/css/site.css" />
+</head>
+<body>
+    <div class="site">
+        <div class="site-header">Search algorithms</div>
+        <div class="site-navigation">
+            <h2>Backend Academy</h2>
+            <h3>Courses</h3>
+            <ul class="nav-items">
+                <li class="nav-item">Database fundamentals</li>
+                <li class="nav-item selected">Search algorithms</li>
+                <li class="nav-item">Security</li>
+            </ul>
+        </div>
+        <div class="site-sub-navigation">
+            <ul class="sub-nav-items">
+                <li class="sub-nav-item">Assignments</li>
+                <li class="sub-nav-item selected">Documents</li>
+                <li class="sub-nav-item">About</li>
+            </ul>
+        </div>
+        <div class="site-content">
+            @RenderBody()
+        </div>
+    </div>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
