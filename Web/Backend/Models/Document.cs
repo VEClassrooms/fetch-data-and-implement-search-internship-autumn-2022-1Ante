@@ -7,6 +7,6 @@ namespace Web.Backend.Models
         public int Id { get; set; }
         public string FileName { get; set; }
         public DateTime UploadedDate { get; set; }
-        public User UploadedBy { get; set; }
+        public int UploadedBy { get; set; }
     }
 }

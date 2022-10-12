@@ -1,30 +1,62 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
+using Microsoft.AspNetCore.Routing.Constraints;
+using Microsoft.EntityFrameworkCore;
 using Web.Backend.Models;
 
 namespace Web.Backend
 {
-    public static class DatabaseAccess
+    public class DatabaseAccess
     {
-        public static List<Document> GetDocuments(string searchString = null)
+        public static List<dynamic> GetDocuments()
         {
-            return new List<Document>()
-                                    {
-                                        new Document() 
-                                        {
-                                            Id = 174, 
-                                            FileName = "The Caves of Steel.pdf", 
-                                            UploadedDate = DateTime.Parse("2021-09-29"),
-                                            UploadedBy = new User(){Id = 101, FirstName = "Isaac", LastName = "Asimov"}
-                                        },
-                                        new Document() 
-                                        {
-                                            Id = 192, 
-                                            FileName = "Refactoring.pdf", 
-                                            UploadedDate = DateTime.Parse("2021-10-01"),
-                                            UploadedBy = new User(){Id = 108, FirstName = "Martin", LastName = "Fowler"}
-                                        }
-                                    };
+                    
+            using AppDbContext context = new AppDbContext();
+            {
+                var results = from a in context.Users
+                              join b in context.Documents on a.Id equals b.UploadedBy                              
+                              select new { a.FirstName, a.LastName, b.FileName, b.UploadedDate };
+
+                var list = results.Select(x =>
+                    new
+                    {
+                        x.FirstName,
+                        x.LastName,
+                        x.FileName,
+                        x.UploadedDate,
+
+                    })
+                    .Cast<dynamic>()
+                    .ToList<dynamic>();
+                return list;
+            }
         }
+
+        public static List<dynamic> GetDocuments(string searchString)
+        {
+            using AppDbContext context = new AppDbContext();
+            {
+                var results = from a in context.Users
+                              join b in context.Documents on a.Id equals b.UploadedBy
+                              where a.FirstName.Contains(searchString) || a.LastName.Contains (searchString) || b.FileName.Contains(searchString) 
+                              select new { a.FirstName, a.LastName, b.FileName, b.UploadedDate };
+
+                var list = results.Select(x =>
+                    new
+                    {
+                        x.FirstName,
+                        x.LastName,
+                        x.FileName,
+                        x.UploadedDate,
+
+                    })
+                    .Cast<dynamic>()
+                    .ToList<dynamic>();
+                return list;
+            }
+        }
+       
     }
 }
