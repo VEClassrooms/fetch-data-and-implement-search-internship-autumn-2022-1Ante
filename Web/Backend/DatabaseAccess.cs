@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Routing.Constraints;
 using Microsoft.EntityFrameworkCore;
@@ -10,53 +12,62 @@ namespace Web.Backend
 {
     public class DatabaseAccess
     {
-        public static List<dynamic> GetDocuments()
+        public static List<Document> GetDocuments()
         {
-                    
+            List<Document> documents = new List<Document>();           
+
             using AppDbContext context = new AppDbContext();
             {
-                var results = from a in context.Users
-                              join b in context.Documents on a.Id equals b.UploadedBy                              
-                              select new { a.FirstName, a.LastName, b.FileName, b.UploadedDate };
+                var results = from a in context.Users                              
+                              join b in context.Documents on a.Id equals b.UploadedBy
+                              join c in context.Users on b.UploadedBy equals c.Id
+                              select new { c.Id, c.FirstName, c.LastName, b.FileName, b.UploadedDate };              
 
-                var list = results.Select(x =>
-                    new
+                
+                foreach (var item in results)
+                {
+                    documents.Add(new Document()
                     {
-                        x.FirstName,
-                        x.LastName,
-                        x.FileName,
-                        x.UploadedDate,
+                        FileName = item.FileName,
+                        UploadedDate = item.UploadedDate,
+                        User = new User() { Id = item.Id, FirstName = item.FirstName, LastName = item.LastName }
+                    });
+                }                
 
-                    })
-                    .Cast<dynamic>()
-                    .ToList<dynamic>();
-                return list;
+                return documents;
+                
             }
+
+           
         }
 
-        public static List<dynamic> GetDocuments(string searchString)
+        public static List<Document> GetDocuments(string searchString)
         {
+            List<Document> documents = new List<Document>();
+
             using AppDbContext context = new AppDbContext();
             {
                 var results = from a in context.Users
                               join b in context.Documents on a.Id equals b.UploadedBy
-                              where a.FirstName.Contains(searchString) || a.LastName.Contains (searchString) || b.FileName.Contains(searchString) 
-                              select new { a.FirstName, a.LastName, b.FileName, b.UploadedDate };
+                              join c in context.Users on b.UploadedBy equals c.Id
+                              where c.FirstName.Contains(searchString) || c.LastName.Contains(searchString) || b.FileName.Contains(searchString)
+                              select new { c.Id, c.FirstName, c.LastName, b.FileName, b.UploadedDate };
 
-                var list = results.Select(x =>
-                    new
+
+                foreach (var item in results)
+                {
+                    documents.Add(new Document()
                     {
-                        x.FirstName,
-                        x.LastName,
-                        x.FileName,
-                        x.UploadedDate,
+                        FileName = item.FileName,
+                        UploadedDate = item.UploadedDate,
+                        User = new User() { Id = item.Id, FirstName = item.FirstName, LastName = item.LastName }
+                    });
+                }
 
-                    })
-                    .Cast<dynamic>()
-                    .ToList<dynamic>();
-                return list;
+                return documents;
+
             }
         }
-       
+
     }
 }
