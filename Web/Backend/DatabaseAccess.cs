@@ -1,30 +1,65 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Linq;
+using System.Security.Cryptography.X509Certificates;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
+using Microsoft.AspNetCore.Routing.Constraints;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Web.Backend.Models;
 
 namespace Web.Backend
 {
-    public static class DatabaseAccess
+    public class DatabaseAccess
     {
-        public static List<Document> GetDocuments(string searchString = null)
+        public static List<Document> GetDocuments()
         {
-            return new List<Document>()
-                                    {
-                                        new Document() 
-                                        {
-                                            Id = 174, 
-                                            FileName = "The Caves of Steel.pdf", 
-                                            UploadedDate = DateTime.Parse("2021-09-29"),
-                                            UploadedBy = new User(){Id = 101, FirstName = "Isaac", LastName = "Asimov"}
-                                        },
-                                        new Document() 
-                                        {
-                                            Id = 192, 
-                                            FileName = "Refactoring.pdf", 
-                                            UploadedDate = DateTime.Parse("2021-10-01"),
-                                            UploadedBy = new User(){Id = 108, FirstName = "Martin", LastName = "Fowler"}
-                                        }
-                                    };
+            List<Document> documents = new List<Document>();
+
+            using AppDbContext context = new AppDbContext();
+            {
+                var results = from a in context.Users
+                              join b in context.Documents on a.Id equals b.UploadedBy
+                              join c in context.Users on b.UploadedBy equals c.Id
+                              select new Document()
+                              {
+                                  FileName = b.FileName,
+                                  UploadedDate = b.UploadedDate,
+                                  User = new User() { Id = c.Id, FirstName = c.FirstName, LastName = c.LastName }
+                              };
+
+                documents.AddRange(results);
+
+                return documents;
+            }
+               
         }
+
+
+        public static List<Document> GetDocuments(string searchString)
+        {
+            List<Document> documents = new List<Document>();
+
+            using AppDbContext context = new AppDbContext();
+            {
+                var results = from a in context.Users
+                              join b in context.Documents on a.Id equals b.UploadedBy
+                              join c in context.Users on b.UploadedBy equals c.Id
+                              where c.FirstName.Contains(searchString) || c.LastName.Contains(searchString) || b.FileName.Contains(searchString)
+                              select new Document()
+                              {
+                                  FileName = b.FileName,
+                                  UploadedDate = b.UploadedDate,
+                                  User = new User() { Id = c.Id, FirstName = c.FirstName, LastName = c.LastName }
+                              };
+
+                documents.AddRange(results);
+
+                return documents;
+
+            }
+        }
+
     }
 }

@@ -24,13 +24,13 @@ namespace Web.Pages
 
         public void OnGet()
         {
-            DocumentsList =  DatabaseAccess.GetDocuments();
+            DocumentsList = DatabaseAccess.GetDocuments();
         }
 
         public void OnPost(string searchString)
         {
             SearchString = searchString;
-            DocumentsList =  DatabaseAccess.GetDocuments(SearchString);
-        }        
+            DocumentsList = DatabaseAccess.GetDocuments(SearchString);
+        }
     }
 }
