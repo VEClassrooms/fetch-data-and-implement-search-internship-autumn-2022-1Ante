@@ -6,6 +6,7 @@ using System.Security.Cryptography.X509Certificates;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Routing.Constraints;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Web.Backend.Models;
 
 namespace Web.Backend
@@ -14,32 +15,27 @@ namespace Web.Backend
     {
         public static List<Document> GetDocuments()
         {
-            List<Document> documents = new List<Document>();           
+            List<Document> documents = new List<Document>();
 
             using AppDbContext context = new AppDbContext();
             {
-                var results = from a in context.Users                              
+                var results = from a in context.Users
                               join b in context.Documents on a.Id equals b.UploadedBy
                               join c in context.Users on b.UploadedBy equals c.Id
-                              select new { c.Id, c.FirstName, c.LastName, b.FileName, b.UploadedDate };              
+                              select new Document()
+                              {
+                                  FileName = b.FileName,
+                                  UploadedDate = b.UploadedDate,
+                                  User = new User() { Id = c.Id, FirstName = c.FirstName, LastName = c.LastName }
+                              };
 
-                
-                foreach (var item in results)
-                {
-                    documents.Add(new Document()
-                    {
-                        FileName = item.FileName,
-                        UploadedDate = item.UploadedDate,
-                        User = new User() { Id = item.Id, FirstName = item.FirstName, LastName = item.LastName }
-                    });
-                }                
+                documents.AddRange(results);
 
                 return documents;
-                
             }
-
-           
+               
         }
+
 
         public static List<Document> GetDocuments(string searchString)
         {
@@ -51,18 +47,14 @@ namespace Web.Backend
                               join b in context.Documents on a.Id equals b.UploadedBy
                               join c in context.Users on b.UploadedBy equals c.Id
                               where c.FirstName.Contains(searchString) || c.LastName.Contains(searchString) || b.FileName.Contains(searchString)
-                              select new { c.Id, c.FirstName, c.LastName, b.FileName, b.UploadedDate };
+                              select new Document()
+                              {
+                                  FileName = b.FileName,
+                                  UploadedDate = b.UploadedDate,
+                                  User = new User() { Id = c.Id, FirstName = c.FirstName, LastName = c.LastName }
+                              };
 
-
-                foreach (var item in results)
-                {
-                    documents.Add(new Document()
-                    {
-                        FileName = item.FileName,
-                        UploadedDate = item.UploadedDate,
-                        User = new User() { Id = item.Id, FirstName = item.FirstName, LastName = item.LastName }
-                    });
-                }
+                documents.AddRange(results);
 
                 return documents;
 
