@@ -1,12 +1,5 @@
-using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
-using System.Security.Cryptography.X509Certificates;
-using Microsoft.AspNetCore.Mvc.ViewFeatures;
-using Microsoft.AspNetCore.Routing.Constraints;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 using Web.Backend.Models;
 
 namespace Web.Backend
@@ -33,7 +26,7 @@ namespace Web.Backend
 
                 return documents;
             }
-               
+
         }
 
 

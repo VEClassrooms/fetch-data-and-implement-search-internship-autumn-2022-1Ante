@@ -1,45 +1,16 @@
-# Backend Internship Challenge Autumn 2022
+Först skapade jag databasen i MS SQL Server för att ha data att hämta. 
 
-This is a selection test for backend developers applying for internship at ViaEcole in the autumn of 2022.
+Sedan ladde jag ner NugetPackages: Microsoft.EntityFrameworkCore (6.0.9), Microsoft.EntityFrameworkCore.Design (6.0.9), Microsoft.EntityFrameworkCore.SqlServer (6.0.9) och
+Microsoft.EntityFrameworkCore.Tools (6.0.9).
 
-You should extend this website to fetch and search data from a database.
+Sedan skapade jag en klass under Models som fick namnet "AppDbContext" och i den skapade jag kopplingen mellan
+Visual Studio och MS SQL Server.
 
-## Get up and running
+Efter det gick jag in i DatabaseAccess.cs och skrev en metod för att hämta alla dokument i databasen och namnet
+på den som laddat upp dokumentet. Jag använde AppDbContext för att kommunicera med MS SQL Server. Sedan skrev jag en query. Funktionen returnerar en lista av typen "Document". Listan skapas i funktionen och i listan lägger jag in objekt av typen "Document" med properties (FileName, UploadedDate och User med Id, FirstName, LastName).
 
-1. Make sure you have [.NET 6.0 SDK](https://dotnet.microsoft.com/download/dotnet/6.0) installed.
-2. Clone and open the project backend-internship-challenge-autumn2022/Web in your prefered IDE (VS Code, Visual Studio etc.).
-3. Build and Run the project backend-internship-challenge-autumn2022/Web.
-4. You should see a web page with a list of two documents. 
+För att alla dokument ska hämtas ändrade jag "public User UploadedBy" till "public int Uploadedby" i Document.cs. Anledningen är att "public int UploadedBy" i Document.cs och id i User.cs ska vara av samma typ dvs en int. Propertyn "public User UploadedBy" är användar-id:n från User.cs. 
 
-## Assignment
+Jag lade även till en User-property (public User User) i Document.cs. User-propertyn behövs för att kunna lägga till Users i Document-objekten. 
 
-The documents are not fetched from a database. You should create a database and fetch documents from that database and implement search. Write the code as simple and lean as you can. Document your toughts and how you solved the assignment in a Markdown (.md) file.
-
-### Preparation
-
-Create a MS SQL Server Database. Create it locally on your machine or a Azure SQL Database.
-
-Run the script FillDatabase.sql against your database to create tables and insert data to work with.
-
-### Fetch data from the database
-
-Rewrite the code in DatabaseAccess.cs to fetch the documents from the database. Use your prefered technique for fetching the data (ADO.NET, Entity Framework etc.).
-
-### Implement search
-
-On the web page there is a search textbox that posts the search string to a controller action if you hit Enter. 
-
-* Search in FileName, FirstName and LastName.
-* The search should be done on the server (not in the browser).
-* Implement search as good as you can. Think about how the user would like the search to work.
-
-### Document your assignment process
-
-Document how your search works and how your thought process went during the assignment in a Markdown (.md) file.
-
-## Submit your contribution
-
-This description describes how you complete the assignment you got from Github Classroom.
-
-* Commit your changes
-* Push changes to the Github Classroom repository
+Sedan gjorde jag sökfunktionen med en query där jag lade till villkor, att uppgifter ska hämtas om söksträngen innehåller något som stämmer med FirstName, eller LastName eller FileName. Man kan söka på hela eller en del av FirstName, LastName eller FileName och få träffar.
